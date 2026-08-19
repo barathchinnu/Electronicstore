@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiUpload, FiX, FiPlus, FiMinus } from 'react-icons/fi';
+import { FiUpload, FiX, FiPlus, FiMinus, FiPackage, FiTag, FiDollarSign, FiFileText, FiList, FiImage, FiFlag } from 'react-icons/fi';
 import { getCategories } from '../../services/categoryService';
 import { uploadProductImages } from '../../services/productService';
 import toast from 'react-hot-toast';
@@ -27,7 +27,7 @@ export default function ProductForm({ initialData = null, onSubmit, submitLabel 
     const { name, value, type, checked } = e.target;
     setForm(p => ({ ...p, [name]: type === 'checkbox' ? checked : value }));
     // Auto-calc discount
-    if ((name === 'price' || name === 'originalPrice') && form.originalPrice && form.price) {
+    if ((name === 'price' || name === 'originalPrice') && (name === 'price' ? form.originalPrice : value)) {
       const op = name === 'originalPrice' ? +value : +form.originalPrice;
       const pr = name === 'price' ? +value : +form.price;
       if (op > pr && op > 0) {
@@ -86,12 +86,14 @@ export default function ProductForm({ initialData = null, onSubmit, submitLabel 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Basic Info */}
-      <div className="glass rounded-2xl p-5 border border-white/5 space-y-4">
-        <h3 className="font-semibold text-white text-sm border-b border-white/5 pb-3">Basic Information</h3>
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
+        <h3 className="font-bold text-white text-base border-b border-slate-800 pb-3 flex items-center gap-2">
+          <FiPackage className="text-blue-400" /> Basic Information
+        </h3>
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
             <label className="label-dark">Product Name *</label>
-            <input name="name" value={form.name} onChange={handleChange} placeholder="e.g. Sony WH-1000XM5" className="input-dark w-full" required />
+            <input name="name" value={form.name} onChange={handleChange} placeholder="e.g. Sony WH-1000XM5 Wireless Headphones" className="input-dark w-full" required />
           </div>
           <div>
             <label className="label-dark">Brand</label>
@@ -99,28 +101,34 @@ export default function ProductForm({ initialData = null, onSubmit, submitLabel 
           </div>
           <div>
             <label className="label-dark">Category *</label>
-            <select name="category" value={form.category} onChange={handleChange} className="input-dark w-full" required>
-              <option value="">Select category</option>
-              {categories.map(c => <option key={c._id} value={c.name}>{c.icon} {c.name}</option>)}
+            <select name="category" value={form.category} onChange={handleChange} className="input-dark w-full bg-slate-950 text-white" required>
+              <option value="" className="bg-slate-900 text-slate-400">Select category</option>
+              {categories.map(c => (
+                <option key={c._id} value={c.name} className="bg-slate-900 text-white">
+                  {c.icon} {c.name}
+                </option>
+              ))}
             </select>
           </div>
           <div>
-            <label className="label-dark">Stock *</label>
-            <input type="number" name="stock" value={form.stock} onChange={handleChange} placeholder="0" className="input-dark w-full" min="0" required />
+            <label className="label-dark">Stock Units *</label>
+            <input type="number" name="stock" value={form.stock} onChange={handleChange} placeholder="10" className="input-dark w-full" min="0" required />
           </div>
         </div>
       </div>
 
       {/* Pricing */}
-      <div className="glass rounded-2xl p-5 border border-white/5 space-y-4">
-        <h3 className="font-semibold text-white text-sm border-b border-white/5 pb-3">Pricing</h3>
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
+        <h3 className="font-bold text-white text-base border-b border-slate-800 pb-3 flex items-center gap-2">
+          <FiDollarSign className="text-emerald-400" /> Pricing & Discounts
+        </h3>
         <div className="grid sm:grid-cols-3 gap-4">
           <div>
             <label className="label-dark">Selling Price (₹) *</label>
             <input type="number" name="price" value={form.price} onChange={handleChange} placeholder="1999" className="input-dark w-full" min="0" required />
           </div>
           <div>
-            <label className="label-dark">Original Price (₹)</label>
+            <label className="label-dark">Original Price / MRP (₹)</label>
             <input type="number" name="originalPrice" value={form.originalPrice} onChange={handleChange} placeholder="2999" className="input-dark w-full" min="0" />
           </div>
           <div>
@@ -131,28 +139,32 @@ export default function ProductForm({ initialData = null, onSubmit, submitLabel 
       </div>
 
       {/* Description */}
-      <div className="glass rounded-2xl p-5 border border-white/5 space-y-4">
-        <h3 className="font-semibold text-white text-sm border-b border-white/5 pb-3">Description</h3>
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
+        <h3 className="font-bold text-white text-base border-b border-slate-800 pb-3 flex items-center gap-2">
+          <FiFileText className="text-amber-400" /> Product Description
+        </h3>
         <textarea name="description" value={form.description} onChange={handleChange}
-          rows={4} placeholder="Detailed product description..." className="input-dark w-full resize-none" />
+          rows={4} placeholder="Write detailed product features, highlights, and specs summary..." className="input-dark w-full resize-none" />
       </div>
 
       {/* Specifications */}
-      <div className="glass rounded-2xl p-5 border border-white/5 space-y-4">
-        <div className="flex items-center justify-between border-b border-white/5 pb-3">
-          <h3 className="font-semibold text-white text-sm">Specifications</h3>
-          <button type="button" onClick={addSpec} className="flex items-center gap-1 text-blue-400 text-xs hover:text-blue-300">
-            <FiPlus className="text-xs" /> Add
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h3 className="font-bold text-white text-base flex items-center gap-2">
+            <FiList className="text-purple-400" /> Key Specifications
+          </h3>
+          <button type="button" onClick={addSpec} className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600/20 text-blue-400 rounded-lg text-xs font-bold hover:bg-blue-600/30 transition-all">
+            <FiPlus className="text-xs" /> Add Specification
           </button>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-3">
           {form.specifications.map((spec, i) => (
-            <div key={i} className="flex gap-2 items-center">
+            <div key={i} className="flex gap-2.5 items-center">
               <input value={spec.key} onChange={e => handleSpecChange(i, 'key', e.target.value)}
-                placeholder="Key (e.g. Battery Life)" className="input-dark flex-1 text-sm" />
+                placeholder="Feature (e.g. Battery Life)" className="input-dark flex-1 text-xs sm:text-sm" />
               <input value={spec.value} onChange={e => handleSpecChange(i, 'value', e.target.value)}
-                placeholder="Value (e.g. 30 hours)" className="input-dark flex-1 text-sm" />
-              <button type="button" onClick={() => removeSpec(i)} className="text-slate-500 hover:text-red-400 p-1 transition-colors">
+                placeholder="Detail (e.g. Up to 30 hours)" className="input-dark flex-1 text-xs sm:text-sm" />
+              <button type="button" onClick={() => removeSpec(i)} className="p-2 rounded-lg bg-slate-800 text-slate-400 hover:text-red-400 hover:bg-red-500/20 transition-all">
                 <FiMinus className="text-sm" />
               </button>
             </div>
@@ -161,39 +173,43 @@ export default function ProductForm({ initialData = null, onSubmit, submitLabel 
       </div>
 
       {/* Images */}
-      <div className="glass rounded-2xl p-5 border border-white/5 space-y-4">
-        <h3 className="font-semibold text-white text-sm border-b border-white/5 pb-3">Product Images (max 5)</h3>
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
+        <h3 className="font-bold text-white text-base border-b border-slate-800 pb-3 flex items-center gap-2">
+          <FiImage className="text-cyan-400" /> Product Images (max 5)
+        </h3>
         <div className="flex flex-wrap gap-3">
           {images.map((img, i) => (
-            <div key={i} className="relative w-20 h-20 group">
-              <img src={img.url} alt="" className="w-full h-full rounded-xl object-cover bg-slate-800" />
+            <div key={i} className="relative w-24 h-24 group rounded-xl overflow-hidden border border-slate-800 bg-slate-950 p-2 flex items-center justify-center">
+              <img src={img.url} alt="" className="w-full h-full object-contain" />
               <button type="button" onClick={() => removeImage(i)}
-                className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <FiX className="text-white text-xs" />
+                className="absolute top-1 right-1 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center shadow-md transition-transform hover:scale-110">
+                <FiX className="text-xs" />
               </button>
             </div>
           ))}
           {images.length < 5 && (
             <button type="button" onClick={() => fileRef.current?.click()}
-              className="w-20 h-20 rounded-xl border-2 border-dashed border-white/20 flex flex-col items-center justify-center text-slate-400 hover:border-blue-500/50 hover:text-blue-400 transition-all">
+              className="w-24 h-24 rounded-xl border-2 border-dashed border-slate-700 bg-slate-950/50 flex flex-col items-center justify-center text-slate-400 hover:border-blue-500 hover:text-blue-400 transition-all cursor-pointer">
               {uploading ? (
-                <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  <FiUpload className="text-sm mb-1" />
-                  <span className="text-xs">Upload</span>
+                  <FiUpload className="text-base mb-1" />
+                  <span className="text-xs font-semibold">Upload Image</span>
                 </>
               )}
             </button>
           )}
         </div>
         <input ref={fileRef} type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
-        <p className="text-xs text-slate-500">Upload to Cloudinary. Supports JPG, PNG, WebP.</p>
+        <p className="text-xs text-slate-400 font-medium">Supports JPG, PNG, WebP format. Maximum 5MB per file.</p>
       </div>
 
       {/* Flags */}
-      <div className="glass rounded-2xl p-5 border border-white/5">
-        <h3 className="font-semibold text-white text-sm border-b border-white/5 pb-3 mb-4">Product Flags</h3>
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl">
+        <h3 className="font-bold text-white text-base border-b border-slate-800 pb-3 mb-4 flex items-center gap-2">
+          <FiFlag className="text-rose-400" /> Display Flags
+        </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { name: 'featured', label: '✨ Featured' },
@@ -201,24 +217,26 @@ export default function ProductForm({ initialData = null, onSubmit, submitLabel 
             { name: 'flashDeal', label: '🔥 Flash Deal' },
             { name: 'isActive', label: '✅ Active' },
           ].map(({ name, label }) => (
-            <label key={name} className={`flex items-center gap-2 p-3 rounded-xl border cursor-pointer transition-all ${
-              form[name] ? 'border-blue-500/40 bg-blue-500/10 text-blue-300' : 'border-white/10 text-slate-400 hover:border-white/20'
+            <label key={name} className={`flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer transition-all ${
+              form[name] ? 'border-blue-500/60 bg-blue-500/15 text-blue-300 font-bold' : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700'
             }`}>
-              <input type="checkbox" name={name} checked={form[name]} onChange={handleChange} className="accent-blue-500" />
-              <span className="text-sm">{label}</span>
+              <input type="checkbox" name={name} checked={form[name]} onChange={handleChange} className="accent-blue-500 cursor-pointer" />
+              <span className="text-xs sm:text-sm">{label}</span>
             </label>
           ))}
         </div>
       </div>
 
-      {/* Submit */}
-      <div className="flex gap-3">
-        <button type="button" onClick={() => navigate('/admin/products')} className="btn-secondary px-6">Cancel</button>
-        <button type="submit" disabled={loading || uploading} className="btn-primary px-8 disabled:opacity-60">
+      {/* Submit Buttons */}
+      <div className="flex gap-3 pt-2">
+        <button type="button" onClick={() => navigate('/admin/products')} className="py-2.5 px-6 rounded-xl border border-slate-700 text-slate-300 text-sm font-semibold hover:bg-slate-800 transition-all cursor-pointer">
+          Cancel
+        </button>
+        <button type="submit" disabled={loading || uploading} className="py-2.5 px-8 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold shadow-md transition-all disabled:opacity-60 cursor-pointer">
           {loading ? (
             <span className="flex items-center gap-2">
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              Saving...
+              Saving Product...
             </span>
           ) : submitLabel}
         </button>
@@ -226,3 +244,4 @@ export default function ProductForm({ initialData = null, onSubmit, submitLabel 
     </form>
   );
 }
+

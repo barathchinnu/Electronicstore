@@ -10,9 +10,15 @@ const api = axios.create({
 // Request interceptor — attach JWT
 api.interceptors.request.use(
   (config) => {
-    const user = JSON.parse(localStorage.getItem('electrostore_user') || 'null');
-    if (user?.token) {
-      config.headers.Authorization = `Bearer ${user.token}`;
+    let token = null;
+    try {
+      const user = JSON.parse(localStorage.getItem('electrostore_user') || 'null');
+      token = user?.token || localStorage.getItem('token');
+    } catch {
+      token = localStorage.getItem('token');
+    }
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -23,12 +29,9 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('electrostore_user');
-      // Don't force redirect here — let components handle it
-    }
     return Promise.reject(error);
   }
 );
 
 export default api;
+

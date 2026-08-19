@@ -33,9 +33,9 @@ import UserList from './admin/users/UserList';
 
 function CustomerLayout({ children }) {
   return (
-    <div className="min-h-screen bg-[#f1f2f4] text-slate-800">
+    <div className="min-h-screen bg-[#f1f2f4] text-slate-800 flex flex-col">
       <Navbar />
-      <main className="pt-[110px] md:pt-[120px]">{children}</main>
+      <main className="flex-1 main-content-padding">{children}</main>
       <Footer />
       <MobileBottomNav />
     </div>

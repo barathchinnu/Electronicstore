@@ -20,6 +20,7 @@ export default function Navbar() {
   const [searching, setSearching] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('flipkart');
+  const headerRef = useRef(null);
 
   const searchRef = useRef(null);
   const userMenuRef = useRef(null);
@@ -35,6 +36,19 @@ export default function Navbar() {
     setSearchOpen(false);
     setUserMenuOpen(false);
   }, [location]);
+
+  // Dynamically update --header-h CSS variable whenever header height changes
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    const updateHeight = () => {
+      document.documentElement.style.setProperty('--header-h', `${header.offsetHeight}px`);
+    };
+    updateHeight();
+    const ro = new ResizeObserver(updateHeight);
+    ro.observe(header);
+    return () => ro.disconnect();
+  }, []);
 
   // Close menus on outside click
   useEffect(() => {
@@ -85,7 +99,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 shadow-xs">
+    <header ref={headerRef} id="main-header" className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 shadow-xs">
       {/* Top Flipkart Utility Banner Bar */}
       <div className="bg-[#f0f5ff] border-b border-slate-200 text-xs py-1 px-4">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between">
