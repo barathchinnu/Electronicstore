@@ -12,6 +12,7 @@ import {
   FiSettings,
   FiChevronRight,
   FiX,
+  FiImage,
 } from 'react-icons/fi';
 import { MdElectricBolt } from 'react-icons/md';
 import { useAuth } from '../context/AuthContext';
@@ -22,6 +23,7 @@ const navItems = [
   { to: '/admin/categories', icon: FiTag, label: 'Categories' },
   { to: '/admin/orders', icon: FiShoppingBag, label: 'Orders' },
   { to: '/admin/users', icon: FiUsers, label: 'Users' },
+  { to: '/admin/banners', icon: FiImage, label: 'Banners' },
 ];
 
 export default function AdminLayout() {
@@ -157,11 +159,9 @@ export default function AdminLayout() {
       <aside
         className="
           hidden lg:flex
-          fixed
-          left-0
+          sticky
           top-0
-          bottom-0
-          z-50
+          h-screen
           w-72
           min-w-72
           flex-col
@@ -169,6 +169,7 @@ export default function AdminLayout() {
           border-r
           border-slate-800
           shadow-xl
+          flex-shrink-0
         "
       >
         <SidebarContent />
@@ -238,7 +239,6 @@ export default function AdminLayout() {
           flex-1
           min-w-0
           w-full
-          lg:ml-72
         "
       >
 

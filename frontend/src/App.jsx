@@ -30,6 +30,7 @@ import EditProduct from './admin/products/EditProduct';
 import CategoryList from './admin/categories/CategoryList';
 import OrderList from './admin/orders/OrderList';
 import UserList from './admin/users/UserList';
+import BannerList from './admin/banners/BannerList';
 
 function CustomerLayout({ children }) {
   return (
@@ -82,6 +83,7 @@ export default function App() {
               <Route path="categories" element={<CategoryList />} />
               <Route path="orders" element={<OrderList />} />
               <Route path="users" element={<UserList />} />
+              <Route path="banners" element={<BannerList />} />
             </Route>
 
             {/* 404 */}

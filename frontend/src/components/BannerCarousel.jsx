@@ -4,10 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiChevronLeft, FiChevronRight, FiArrowRight, FiZap, FiShield } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { openWhatsApp } from '../utils/whatsapp';
+import { getBanners } from '../services/bannerService';
 
-const slides = [
+const staticSlides = [
   {
-    id: 1,
+    id: 'static-1',
     tag: 'LIMITED TIME DEAL',
     title: 'Dolby Atmos Soundbars',
     sub: 'Up to 55% Off • Starting ₹2,999',
@@ -18,7 +19,7 @@ const slides = [
     waMsg: 'Hi! I want to inquire about Dolby Soundbars offer',
   },
   {
-    id: 2,
+    id: 'static-2',
     tag: 'NEW LAUNCH 2026',
     title: 'Ultra Wireless Earbuds',
     sub: '40Hrs Playtime • Active Noise Cancellation',
@@ -29,7 +30,7 @@ const slides = [
     waMsg: 'Hi! I am interested in the Ultra Wireless Earbuds launch',
   },
   {
-    id: 3,
+    id: 'static-3',
     tag: 'FLASH SALE',
     title: 'Smartwatches & Fitness',
     sub: 'AMOLED Display • BT Calling',
@@ -40,7 +41,7 @@ const slides = [
     waMsg: 'Hi! I want to order Smartwatches on Flash Sale',
   },
   {
-    id: 4,
+    id: 'static-4',
     tag: 'SPECIAL DISCOUNTS',
     title: 'Fast Chargers & Cables',
     sub: '65W GaN Fast Charging Hubs',
@@ -53,27 +54,47 @@ const slides = [
 ];
 
 export default function BannerCarousel() {
+  const [banners, setBanners] = useState([]);
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isPaused) return;
+    const fetchActiveBanners = async () => {
+      try {
+        const { data } = await getBanners();
+        setBanners(data.data || []);
+      } catch (err) {
+        console.error('Failed to load active carousel banners:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchActiveBanners();
+  }, []);
+
+  const activeSlides = banners.length > 0 ? banners : staticSlides;
+
+  useEffect(() => {
+    if (isPaused || activeSlides.length <= 1) return;
     const timer = setInterval(() => {
       setDirection(1);
-      setCurrent((prev) => (prev + 1) % slides.length);
+      setCurrent((prev) => (prev + 1) % activeSlides.length);
     }, 4500);
     return () => clearInterval(timer);
-  }, [isPaused]);
+  }, [isPaused, activeSlides.length]);
 
   const slideNext = () => {
+    if (activeSlides.length <= 1) return;
     setDirection(1);
-    setCurrent((prev) => (prev + 1) % slides.length);
+    setCurrent((prev) => (prev + 1) % activeSlides.length);
   };
 
   const slidePrev = () => {
+    if (activeSlides.length <= 1) return;
     setDirection(-1);
-    setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
+    setCurrent((prev) => (prev - 1 + activeSlides.length) % activeSlides.length);
   };
 
   const slideVariants = {
@@ -91,7 +112,23 @@ export default function BannerCarousel() {
     }),
   };
 
-  const activeSlide = slides[current];
+  if (loading) {
+    return (
+      <div className="w-full my-2">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="lg:col-span-3 h-[240px] sm:h-[300px] md:h-[340px] rounded-2xl bg-slate-200 animate-pulse border border-slate-300" />
+          <div className="hidden lg:flex lg:col-span-1 flex-col gap-3 h-[340px]">
+            <div className="flex-1 rounded-2xl bg-slate-200 animate-pulse border border-slate-300" />
+            <div className="flex-1 rounded-2xl bg-slate-200 animate-pulse border border-slate-300" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const activeSlide = activeSlides[current];
+  const slideId = activeSlide._id || activeSlide.id;
+  const slideImageUrl = activeSlide.image?.url || activeSlide.image;
 
   return (
     <div className="w-full my-2">
@@ -104,7 +141,7 @@ export default function BannerCarousel() {
         >
           <AnimatePresence initial={false} custom={direction}>
             <motion.div
-              key={activeSlide.id}
+              key={slideId}
               custom={direction}
               variants={slideVariants}
               initial="enter"
@@ -123,27 +160,33 @@ export default function BannerCarousel() {
                 <h2 className="text-2xl sm:text-4xl font-black font-display tracking-tight leading-tight text-white mb-1.5 sm:mb-2">
                   {activeSlide.title}
                 </h2>
-                <p className="text-sm sm:text-lg font-bold text-yellow-300 mb-1">
-                  {activeSlide.sub}
-                </p>
-                <p className="text-xs sm:text-sm text-slate-300 line-clamp-2 max-w-md hidden sm:block">
-                  {activeSlide.desc}
-                </p>
+                {activeSlide.sub && (
+                  <p className="text-sm sm:text-lg font-bold text-yellow-300 mb-1">
+                    {activeSlide.sub}
+                  </p>
+                )}
+                {activeSlide.desc && (
+                  <p className="text-xs sm:text-sm text-slate-300 line-clamp-2 max-w-md hidden sm:block">
+                    {activeSlide.desc}
+                  </p>
+                )}
               </div>
 
               {/* Product Background Image */}
-              <div className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 w-36 h-36 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-2xl overflow-hidden shadow-xl border border-white/10 opacity-90 hidden xs:block">
-                <img
-                  src={activeSlide.image}
-                  alt={activeSlide.title}
-                  className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
-                />
-              </div>
+              {slideImageUrl && (
+                <div className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 w-36 h-36 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-2xl overflow-hidden shadow-xl border border-white/10 opacity-90 hidden xs:block bg-slate-950/40 p-2 flex items-center justify-center">
+                  <img
+                    src={slideImageUrl}
+                    alt={activeSlide.title}
+                    className="max-w-full max-h-full object-contain transform group-hover:scale-105 transition-transform duration-700"
+                  />
+                </div>
+              )}
 
               {/* Action Bar */}
               <div className="relative z-10 flex items-center gap-3 pt-2">
                 <button
-                  onClick={() => openWhatsApp(activeSlide.waMsg)}
+                  onClick={() => openWhatsApp(activeSlide.waMsg || `Hi! I want to inquire about the ${activeSlide.title} offer`)}
                   className="bg-[#ffe500] hover:bg-yellow-400 text-slate-950 font-extrabold px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-md transition-transform active:scale-95 cursor-pointer"
                 >
                   <FaWhatsapp className="text-emerald-700 text-base" /> Buy Now
@@ -159,37 +202,43 @@ export default function BannerCarousel() {
           </AnimatePresence>
 
           {/* Navigation Prev/Next Arrows */}
-          <button
-            onClick={slidePrev}
-            aria-label="Previous Slide"
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-xs flex items-center justify-center border border-white/20 transition-all opacity-0 group-hover:opacity-100 z-20 cursor-pointer"
-          >
-            <FiChevronLeft className="text-lg" />
-          </button>
-          <button
-            onClick={slideNext}
-            aria-label="Next Slide"
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-xs flex items-center justify-center border border-white/20 transition-all opacity-0 group-hover:opacity-100 z-20 cursor-pointer"
-          >
-            <FiChevronRight className="text-lg" />
-          </button>
+          {activeSlides.length > 1 && (
+            <>
+              <button
+                onClick={slidePrev}
+                aria-label="Previous Slide"
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-xs flex items-center justify-center border border-white/20 transition-all opacity-0 group-hover:opacity-100 z-20 cursor-pointer"
+              >
+                <FiChevronLeft className="text-lg" />
+              </button>
+              <button
+                onClick={slideNext}
+                aria-label="Next Slide"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-xs flex items-center justify-center border border-white/20 transition-all opacity-0 group-hover:opacity-100 z-20 cursor-pointer"
+              >
+                <FiChevronRight className="text-lg" />
+              </button>
+            </>
+          )}
 
           {/* Carousel Dots */}
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
-            {slides.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => {
-                  setDirection(i > current ? 1 : -1);
-                  setCurrent(i);
-                }}
-                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                  i === current ? 'w-7 bg-[#ffe500]' : 'w-2 bg-white/40 hover:bg-white/70'
-                }`}
-                aria-label={`Go to slide ${i + 1}`}
-              />
-            ))}
-          </div>
+          {activeSlides.length > 1 && (
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+              {activeSlides.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setDirection(i > current ? 1 : -1);
+                    setCurrent(i);
+                  }}
+                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                    i === current ? 'w-7 bg-[#ffe500]' : 'w-2 bg-white/40 hover:bg-white/70'
+                  }`}
+                  aria-label={`Go to slide ${i + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Side Promo Cards (1 col on desktop, hidden or stacked on smaller screens) */}
@@ -232,4 +281,3 @@ export default function BannerCarousel() {
     </div>
   );
 }
-
