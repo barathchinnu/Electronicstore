@@ -58,7 +58,13 @@ export default function ProductList() {
       await deleteProduct(id);
       toast.success('Product deleted');
       setDeleting(null);
-      fetchProducts();
+      // If we just deleted the last item on this page, go back one page
+      const remainingOnPage = products.length - 1;
+      if (remainingOnPage === 0 && page > 1) {
+        setPage((p) => p - 1);
+      } else {
+        fetchProducts();
+      }
     } catch (err) {
       toast.error('Failed to delete product');
     }

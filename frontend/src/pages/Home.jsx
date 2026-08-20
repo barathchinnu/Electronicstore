@@ -26,15 +26,33 @@ export default function Home() {
     const fetchAll = async () => {
       try {
         const [trendRes, flashRes, newRes, bestRes] = await Promise.all([
-          getProducts({ limit: 8, sort: 'popular' }),
+          getProducts({ limit: 8, sort: 'rating' }),
           getProducts({ flashDeal: true, limit: 4 }),
-          getProducts({ limit: 8, sort: 'newest' }),
-          getProducts({ bestSeller: true, limit: 8 }),
+          getProducts({ limit: 12, sort: 'newest' }),
+          getProducts({ bestSeller: true, limit: 12 }),
         ]);
-        setTrending(trendRes.data.data || []);
-        setFlashDeals(flashRes.data.data || []);
-        setNewArrivals(newRes.data.data || []);
-        setBestSellers(bestRes.data.data || []);
+
+        const trendingData = trendRes.data.data || [];
+        const flashData = flashRes.data.data || [];
+        const allNewData = newRes.data.data || [];
+        const allBestData = bestRes.data.data || [];
+
+        // Build a set of IDs shown in earlier sections to deduplicate
+        const trendingIds = new Set(trendingData.map((p) => p._id));
+        const flashIds = new Set(flashData.map((p) => p._id));
+
+        // bestSellers: exclude products already shown in trending
+        const uniqueBestSellers = allBestData.filter((p) => !trendingIds.has(p._id)).slice(0, 8);
+        const bestSellerIds = new Set(uniqueBestSellers.map((p) => p._id));
+
+        // newArrivals: exclude products already in trending or bestSellers
+        const seenIds = new Set([...trendingIds, ...bestSellerIds, ...flashIds]);
+        const uniqueNewArrivals = allNewData.filter((p) => !seenIds.has(p._id)).slice(0, 8);
+
+        setTrending(trendingData);
+        setFlashDeals(flashData);
+        setNewArrivals(uniqueNewArrivals);
+        setBestSellers(uniqueBestSellers);
       } catch (err) {
         console.error(err);
       } finally {

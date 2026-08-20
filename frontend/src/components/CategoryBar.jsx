@@ -1,35 +1,82 @@
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { getCategories } from '../services/categoryService';
 
-const categoryItems = [
+// Static fallback items shown while loading or if DB has no categories
+const staticFallbacks = [
   { id: 'for-you', name: 'For You', icon: '✨', slug: '' },
-  { id: 'fashion', name: 'Fashion', icon: '👕', slug: 'fashion' },
   { id: 'mobiles', name: 'Mobiles', icon: '📱', slug: 'mobiles' },
   { id: 'electronics', name: 'Electronics', icon: '💻', slug: 'electronics' },
-  { id: 'beauty', name: 'Beauty', icon: '💄', slug: 'beauty' },
-  { id: 'home', name: 'Home', icon: '🛋️', slug: 'home' },
-  { id: 'appliances', name: 'Appliances', icon: '📺', slug: 'appliances' },
-  { id: 'toys', name: 'Toys, Baby', icon: '🧸', slug: 'toys' },
-  { id: 'food', name: 'Food & Health', icon: '🧴', slug: 'food' },
-  { id: 'auto', name: 'Auto Acc', icon: '🏎️', slug: 'auto' },
-  { id: 'sports', name: 'Sports & Fitness', icon: '🏏', slug: 'sports' },
-  { id: 'furniture', name: 'Furniture', icon: '🪑', slug: 'furniture' },
-  { id: 'books', name: 'Books & More', icon: '📚', slug: 'books' },
-  { id: '2wheelers', name: '2 Wheelers', icon: '🛵', slug: '2-wheelers' },
+  { id: 'earphones', name: 'Earphones', icon: '🎧', slug: 'earphones' },
+  { id: 'smart-watches', name: 'Smart Watches', icon: '⌚', slug: 'smart-watches' },
+  { id: 'laptops', name: 'Laptops', icon: '💻', slug: 'laptops' },
+  { id: 'keyboards', name: 'Keyboards', icon: '⌨️', slug: 'keyboards' },
+  { id: 'power-banks', name: 'Power Banks', icon: '🔋', slug: 'power-banks' },
+  { id: 'chargers', name: 'Chargers', icon: '🔌', slug: 'chargers' },
+  { id: 'accessories', name: 'Accessories', icon: '🖱️', slug: 'laptop-accessories' },
 ];
+
+// Emoji mapping for common category names
+const emojiMap = {
+  mobiles: '📱', phones: '📱', smartphones: '📱',
+  earphones: '🎧', headphones: '🎧', earbuds: '🎧',
+  'smart watches': '⌚', smartwatches: '⌚', watches: '⌚',
+  laptops: '💻', computers: '🖥️',
+  keyboards: '⌨️',
+  mouse: '🖱️', accessories: '🖱️', 'laptop accessories': '🖱️',
+  'power banks': '🔋', powerbanks: '🔋',
+  chargers: '🔌', cables: '🔌',
+  speakers: '🔊', soundbars: '🔊',
+  cameras: '📷',
+  tablets: '📱',
+  gaming: '🎮',
+  electronics: '💻',
+};
+
+function getEmoji(name = '') {
+  const lower = name.toLowerCase();
+  return emojiMap[lower] || '📦';
+}
 
 export default function CategoryBar() {
   const location = useLocation();
+  const [dbCategories, setDbCategories] = useState([]);
+
+  useEffect(() => {
+    getCategories()
+      .then(({ data }) => {
+        const cats = (data.data || []).map((c) => ({
+          id: c._id,
+          name: c.name,
+          icon: c.icon || getEmoji(c.name),
+          slug: c.slug || c.name.toLowerCase().replace(/\s+/g, '-'),
+        }));
+        if (cats.length > 0) setDbCategories(cats);
+      })
+      .catch(() => {}); // silently fail — use static fallback
+  }, []);
+
+  // If DB categories loaded, prepend "For You" and use them; else use static fallback
+  const displayCategories =
+    dbCategories.length > 0
+      ? [{ id: 'for-you', name: 'For You', icon: '✨', slug: '' }, ...dbCategories]
+      : staticFallbacks;
 
   return (
     <div className="w-full bg-white border-b border-slate-200 shadow-xs">
       <div className="max-w-[1400px] mx-auto px-2 sm:px-4">
         <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto py-2.5 hide-scrollbar scroll-smooth">
-          {categoryItems.map((cat) => {
-            const isActive = cat.slug === '' 
-              ? location.pathname === '/' && !location.search 
-              : location.pathname.includes(cat.slug);
+          {displayCategories.map((cat) => {
+            // "For You" is active on home root
+            const isActive =
+              cat.slug === ''
+                ? location.pathname === '/' && !location.search
+                : location.pathname.includes(cat.slug) ||
+                  location.search.includes(`category=${cat.slug}`);
 
-            const targetUrl = cat.slug === '' ? '/' : `/category/${cat.slug}`;
+            // Route: empty slug → home, otherwise → category page
+            const targetUrl =
+              cat.slug === '' ? '/' : `/category/${cat.slug}`;
 
             return (
               <Link
@@ -42,9 +89,13 @@ export default function CategoryBar() {
                 <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-xl sm:text-2xl group-hover:scale-110 group-hover:bg-blue-50 transition-all shadow-xs">
                   {cat.icon}
                 </div>
-                <span className={`text-[11px] sm:text-xs font-medium mt-1.5 whitespace-nowrap ${
-                  isActive ? 'text-[#2874f0] font-bold' : 'text-slate-700 group-hover:text-[#2874f0]'
-                }`}>
+                <span
+                  className={`text-[11px] sm:text-xs font-medium mt-1.5 whitespace-nowrap ${
+                    isActive
+                      ? 'text-[#2874f0] font-bold'
+                      : 'text-slate-700 group-hover:text-[#2874f0]'
+                  }`}
+                >
                   {cat.name}
                 </span>
               </Link>

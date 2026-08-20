@@ -70,8 +70,8 @@ export default function App() {
             <Route path="/cart" element={<CustomerLayout><Cart /></CustomerLayout>} />
             <Route path="/wishlist" element={<CustomerLayout><Wishlist /></CustomerLayout>} />
             <Route path="/search" element={<CustomerLayout><Search /></CustomerLayout>} />
-            <Route path="/login" element={<CustomerLayout><Login /></CustomerLayout>} />
-            <Route path="/register" element={<CustomerLayout><Register /></CustomerLayout>} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/profile" element={<CustomerLayout><Profile /></CustomerLayout>} />
 
             {/* Admin Routes */}

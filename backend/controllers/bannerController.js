@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const cloudinary = require('cloudinary').v2;
+const fs = require('fs');
 const Banner = require('../models/Banner');
 
 // Configure cloudinary
@@ -109,6 +110,9 @@ const uploadBannerImage = asyncHandler(async (req, res) => {
       transformation: [{ width: 1200, height: 600, crop: 'limit', quality: 'auto' }],
     });
 
+    // Clean up temp file from disk after successful upload
+    try { fs.unlinkSync(req.file.path); } catch (_) {}
+
     res.json({
       success: true,
       data: {
@@ -117,6 +121,8 @@ const uploadBannerImage = asyncHandler(async (req, res) => {
       },
     });
   } catch (err) {
+    // Clean up temp file even on failure
+    try { fs.unlinkSync(req.file.path); } catch (_) {}
     res.status(500);
     throw new Error(`Cloudinary upload failed: ${err.message}`);
   }

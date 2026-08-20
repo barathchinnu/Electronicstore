@@ -54,7 +54,8 @@ const getProducts = asyncHandler(async (req, res) => {
   else if (sort === 'price_desc') sortOption = { price: -1 };
   else if (sort === 'rating') sortOption = { rating: -1 };
   else if (sort === 'discount') sortOption = { discount: -1 };
-  else if (sort === 'popular') sortOption = { numReviews: -1 };
+  else if (sort === 'popular') sortOption = { numReviews: -1, rating: -1 };
+  else if (sort === 'newest') sortOption = { createdAt: -1 };
 
   const skip = (Number(page) - 1) * Number(limit);
   const total = await Product.countDocuments(query);
