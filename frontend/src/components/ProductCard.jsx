@@ -97,7 +97,7 @@ export default function ProductCard({ product }) {
         <div className="p-3 sm:p-3.5 flex-1 flex flex-col justify-between bg-white">
           <div>
             <p className="text-[10px] sm:text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5 truncate">
-              {product.brand || 'ElectroStore'}
+              {product.brand || 'Insta Digital'}
             </p>
             <h3 className="text-xs sm:text-sm font-bold text-slate-800 line-clamp-2 mb-1.5 leading-snug group-hover:text-[#2874f0] transition-colors min-h-[2.5rem]">
               {product.name}

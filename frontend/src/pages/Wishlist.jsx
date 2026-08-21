@@ -55,7 +55,7 @@ export default function Wishlist() {
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{product.brand || 'ElectroStore'}</p>
+                  <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{product.brand || 'Insta Digital'}</p>
                   <Link to={`/products/${product._id}`} className="text-sm sm:text-base font-bold text-slate-900 hover:text-[#2874f0] line-clamp-2 transition-colors block">
                     {product.name}
                   </Link>

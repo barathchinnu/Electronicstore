@@ -21,9 +21,11 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <Link to="/" className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-[#ffe500] flex items-center justify-center">
-                <MdElectricBolt className="text-[#2874f0] text-xl" />
-              </div>
+              <img
+                src="/insta-logo.jpg"
+                alt="Insta Digital Logo"
+                className="w-8 h-8 rounded-full object-cover"
+              />
               <span className="text-base font-black text-white font-display leading-tight">
                 Insta Digital<br />
                 <span className="text-[10px] text-yellow-400 font-normal">Shopping</span>
@@ -36,7 +38,7 @@ export default function Footer() {
               Owner: <span className="text-yellow-400 font-bold">R.Adhithya</span>
             </p>
             <button
-              onClick={() => openWhatsApp('Hi! I have a question about ElectroStore.')}
+              onClick={() => openWhatsApp('Hi! I have a question about Insta Digital Shopping.')}
               className="bg-[#388e3c] text-white text-xs font-bold px-3 py-2 rounded-md flex items-center gap-1.5 hover:bg-[#2e7d32] transition-colors"
             >
               <FaWhatsapp className="text-sm" /> Chat on WhatsApp
@@ -113,7 +115,7 @@ export default function Footer() {
 
         <div className="border-t border-slate-800 mt-8 pt-4 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
           <p>© 2024 Insta Digital Shopping. Owner: R.Adhithya</p>
-          <p>Flipkart Style UI Redesign 🚀</p>
+          <p>Insta Digital Shopping UI 🚀</p>
         </div>
       </div>
     </footer>

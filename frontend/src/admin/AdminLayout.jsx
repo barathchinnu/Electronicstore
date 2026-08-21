@@ -50,13 +50,15 @@ export default function AdminLayout() {
           className="flex items-center gap-3"
           onClick={() => setDrawerOpen(false)}
         >
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-md flex-shrink-0">
-            <MdElectricBolt className="text-white text-xl" />
-          </div>
+          <img
+            src="/insta-logo.jpg"
+            alt="Insta Digital Logo"
+            className="w-9 h-9 rounded-full object-cover flex-shrink-0 border border-slate-700 shadow-sm"
+          />
 
           <div className="min-w-0">
             <p className="font-extrabold text-white text-sm tracking-tight whitespace-nowrap">
-              ElectroStore
+              Insta Digital
             </p>
 
             <p className="text-[11px] text-blue-400 font-bold uppercase tracking-wider whitespace-nowrap">
@@ -273,7 +275,11 @@ export default function AdminLayout() {
             to="/admin"
             className="flex items-center gap-2"
           >
-            <MdElectricBolt className="text-blue-400 text-xl" />
+            <img
+              src="/insta-logo.jpg"
+              alt="Insta Digital Logo"
+              className="w-6 h-6 rounded-full object-cover"
+            />
 
             <span className="font-extrabold text-white text-sm">
               Admin Portal

@@ -19,7 +19,7 @@ export default function Navbar() {
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('flipkart');
+  const [activeTab, setActiveTab] = useState('insta');
   const headerRef = useRef(null);
 
   const searchRef = useRef(null);
@@ -100,21 +100,21 @@ export default function Navbar() {
 
   return (
     <header ref={headerRef} id="main-header" className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 shadow-xs">
-      {/* Top Flipkart Utility Banner Bar */}
+      {/* Top Utility Banner Bar */}
       <div className="bg-[#f0f5ff] border-b border-slate-200 text-xs py-1 px-4">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between">
           {/* Left Pill Tabs */}
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setActiveTab('flipkart')}
+              onClick={() => setActiveTab('insta')}
               className={`flex items-center gap-1.5 px-3 py-0.5 rounded-full font-bold text-xs transition-all ${
-                activeTab === 'flipkart'
+                activeTab === 'insta'
                   ? 'bg-[#ffe500] text-[#212121] shadow-xs'
                   : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
               }`}
             >
-              <MdElectricBolt className="text-yellow-600 text-sm" />
-              <span>Flipkart</span>
+              <img src="/insta-logo.jpg" alt="" className="w-4 h-4 rounded-full object-cover" />
+              <span>Insta Digital</span>
             </button>
             <button
               onClick={() => setActiveTab('travel')}
@@ -138,20 +138,22 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Main Flipkart Header Row */}
+      {/* Main Header Row */}
       <div className="max-w-[1400px] mx-auto px-3 sm:px-6 py-2.5">
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 flex-shrink-0 group">
-            <div className="w-9 h-9 rounded-lg bg-[#ffe500] border border-yellow-400 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
-              <MdElectricBolt className="text-[#2874f0] text-2xl" />
-            </div>
+            <img
+              src="/insta-logo.jpg"
+              alt="Insta Digital Shopping Logo"
+              className="w-10 h-10 rounded-full object-cover border border-slate-200 shadow-xs group-hover:scale-105 transition-transform"
+            />
             <div className="leading-tight">
               <span className="text-lg font-black tracking-tight text-[#2874f0] font-display flex items-center gap-1">
-                Flipkart <span className="text-xs text-yellow-600 italic font-bold">Plus</span>
+                Insta Digital <span className="text-xs text-yellow-600 italic font-bold">Shopping</span>
               </span>
               <p className="text-[10px] text-slate-500 font-medium -mt-1 tracking-wide">
-                Insta Digital Shopping
+                Smart Choice, Best Deals!
               </p>
             </div>
           </Link>
@@ -185,7 +187,7 @@ export default function Navbar() {
                   className="absolute left-0 right-0 top-12 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden z-50"
                 >
                   {searching ? (
-                    <div className="p-4 text-center text-slate-500 text-sm">Searching Flipkart inventory...</div>
+                    <div className="p-4 text-center text-slate-500 text-sm">Searching inventory...</div>
                   ) : (
                     <div className="divide-y divide-slate-100">
                       {searchResults.map((product) => (
@@ -202,7 +204,7 @@ export default function Navbar() {
                           />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-slate-900 truncate">{product.name}</p>
-                            <p className="text-xs text-slate-500">{product.brand || 'ElectroStore'}</p>
+                            <p className="text-xs text-slate-500">{product.brand || 'Insta Digital'}</p>
                           </div>
                           <span className="text-sm font-bold text-[#2874f0]">
                             ₹{product.price?.toLocaleString('en-IN')}

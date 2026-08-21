@@ -217,7 +217,7 @@ export default function ProductList() {
                           </p>
 
                           <p className="text-[11px] text-slate-400 font-medium mt-0.5">
-                            {product.brand || 'ElectroStore'}
+                            {product.brand || 'Insta Digital'}
                           </p>
                         </div>
 
