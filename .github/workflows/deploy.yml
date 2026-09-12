@@ -1,4 +1,4 @@
-name: Deploy Electronic Store
+name: Electronic Store CI/CD
 
 on:
   push:
@@ -6,9 +6,42 @@ on:
       - main
 
 jobs:
+  # =========================
+  # CI - Build & Validate
+  # =========================
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Backend Dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Install Frontend Dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build Frontend
+        working-directory: frontend
+        run: npm run build
+
+  # =========================
+  # CD - Deploy to EC2
+  # =========================
   deploy:
     name: Deploy to AWS EC2
     runs-on: ubuntu-latest
+
+    needs: build
 
     steps:
       - name: Deploy to EC2
@@ -30,16 +63,31 @@ jobs:
 
             cd ~/Electronicstore
 
+            echo "================================"
             echo "Pulling latest code..."
+            echo "================================"
+
             git pull --ff-only origin main
 
+            echo "================================"
             echo "Building Docker containers..."
+            echo "================================"
+
             docker compose up -d --build
 
-            echo "Removing unused Docker images..."
+            echo "================================"
+            echo "Cleaning unused Docker images..."
+            echo "================================"
+
             docker image prune -f
 
-            echo "Deployment completed successfully!"
+            echo "================================"
+            echo "Checking running containers..."
+            echo "================================"
 
             docker ps
+
+            echo "================================"
+            echo "Deployment completed successfully!"
+            echo "================================"
           EOF
