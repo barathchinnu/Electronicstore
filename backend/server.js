@@ -17,9 +17,7 @@ if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
 
 // Middleware
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production'
-    ? ['https://electronicstore-chi.vercel.app']
-    : ['http://localhost:5173', 'http://localhost:3000'],
+  origin: ['https://electronicstore-chi.vercel.app','http://localhost:5173', 'http://localhost:3000', 'http://13.60.62.191'],
   credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));
