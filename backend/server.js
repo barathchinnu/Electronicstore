@@ -9,6 +9,7 @@ const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 dotenv.config();
 connectDB();
 
+// CI/CD deployment test
 const app = express();
 
 // Create uploads directory if it doesn't exist
